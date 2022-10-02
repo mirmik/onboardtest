@@ -1,6 +1,11 @@
 #include <getopt.h>
+#include <memory>
 #include <nos/fprint.h>
+#include <nos/inet/tcp_server.h>
+#include <nos/input.h>
 #include <nos/io/serial_port.h>
+#include <nos/util/string.h>
+#include <onboardtest/testenv.h>
 #include <string>
 
 const char *VERSION = "0.1.0";
@@ -59,6 +64,78 @@ void parse_args(int argc, char **argv)
     filename = argv[optind];
 }
 
+void start_with_iostream(nos::iostream &stream)
+{
+    nos::fprintln("Starting with iostream");
+
+    // send start command
+    nos::println_to(stream, "STARTTESTS");
+
+    while (1)
+    {
+        auto exstr = nos::readline_from(stream);
+        if (!exstr)
+        {
+            nos::fprintln("Connection closed");
+            break;
+        }
+
+        if (nos::trim(exstr.value()) == onboardtest::onboardtest_exit_command)
+        {
+            nos::fprintln("Exit command received");
+            break;
+        }
+
+        nos::fprintln("Received: {}", exstr.value());
+    }
+}
+
+void start(const std::string &filename)
+{
+    if (filename[0] == '/')
+    {
+        nos::serial_port port(filename.c_str());
+        if (!port.good())
+        {
+            nos::println("Failed to open port");
+            exit(1);
+        }
+
+        start_with_iostream(port);
+        port.close();
+    }
+    else if (filename[0] == ':')
+    {
+        auto portno = std::stoi(filename.substr(1));
+        nos::inet::tcp_server server("0.0.0.0", portno);
+        server.reusing(true);
+        if (!server.good())
+        {
+            nos::println("Failed to open port");
+            exit(1);
+        }
+
+        nos::fprintln("Waiting for connection on port {}...", portno);
+        auto client = server.accept();
+        if (!client.good())
+        {
+            nos::println("Failed to accept client");
+            exit(1);
+        }
+
+        nos::println("Accepted tcp client");
+        start_with_iostream(client);
+
+        client.close();
+        server.close();
+    }
+    else
+    {
+        nos::println("Invalid port name");
+        exit(1);
+    }
+}
+
 int main(int argc, char **argv)
 {
     parse_args(argc, argv);
@@ -69,21 +146,5 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    nos::serial_port port(filename.c_str());
-    if (!port.good())
-    {
-        nos::println("Failed to open port");
-        return 1;
-    }
-
-    nos::println_to(port, "STARTTEST");
-
-    while (1)
-    {
-        char c;
-        if (port.read(&c, 1) == 1)
-        {
-            nos::write(&c, 1);
-        }
-    }
+    start(filename);
 }

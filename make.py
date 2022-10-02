@@ -2,8 +2,18 @@
 
 import licant
 
-licant.cxx_application("target",
+licant.execute("onboardtest.g.py")
+
+licant.cxx_application("onboardtest-listener",
                        sources=["src/main.cpp"],
+                       mdepends=["onboardtest"],
                        libs=["nos"])
 
-licant.ex("target")
+licant.cxx_application("onboardtest-test",
+                       sources=["tests/main.cpp"],
+                       mdepends=["onboardtest"],
+                       libs=["nos"])
+
+licant.fileset("all", ["onboardtest-listener", "onboardtest-test"])
+
+licant.ex("all")
