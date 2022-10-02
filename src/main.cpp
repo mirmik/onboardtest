@@ -82,6 +82,21 @@ void start_with_iostream(nos::iostream &stream)
 
         if (nos::trim(exstr.value()) == onboardtest::onboardtest_exit_command)
         {
+            auto exstatus = nos::readline_from(stream);
+
+            if (nos::trim(*exstatus) == "success")
+            {
+                nos::fprintln("Status: Success");
+            }
+            else if (nos::trim(*exstatus) == "error")
+            {
+                nos::fprintln("Status: Failure");
+            }
+            else
+            {
+                nos::fprintln("Unknown exit status");
+            }
+
             nos::fprintln("Exit command received");
             break;
         }
@@ -94,7 +109,7 @@ void start(const std::string &filename)
 {
     if (filename[0] == '/')
     {
-        nos::serial_port port(filename.c_str());
+        nos::serial_port port(filename.c_str(), 115200, 'n', 8, 1);
         if (!port.good())
         {
             nos::println("Failed to open port");
