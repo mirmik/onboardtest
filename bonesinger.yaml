@@ -8,6 +8,9 @@ pipeline:
       - name: make
         run: ./make.py
 
+      - name: install
+        run: ./make.py install
+
       - name: licant-libs
         run: licant-libs .
 

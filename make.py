@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import licant
+import licant.install
 
 licant.execute("onboardtest.g.py")
 
@@ -15,5 +16,7 @@ licant.cxx_application("onboardtest-test",
                        libs=["nos"])
 
 licant.fileset("all", ["onboardtest-listener", "onboardtest-test"])
+
+licant.install.install_application(tgt="install", src="onboardtest-listener", dst="onboardtest-listener")
 
 licant.ex("all")
