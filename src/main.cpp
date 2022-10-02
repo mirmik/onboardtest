@@ -84,20 +84,23 @@ void start_with_iostream(nos::iostream &stream)
         {
             auto exstatus = nos::readline_from(stream);
 
+            nos::fprintln("Exit command received");
+
             if (nos::trim(*exstatus) == "success")
             {
                 nos::fprintln("Status: Success");
+                exit(0);
             }
             else if (nos::trim(*exstatus) == "error")
             {
                 nos::fprintln("Status: Failure");
+                exit(-1);
             }
             else
             {
                 nos::fprintln("Unknown exit status");
+                exit(-1);
             }
-
-            nos::fprintln("Exit command received");
             break;
         }
 
