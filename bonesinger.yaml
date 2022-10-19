@@ -9,7 +9,7 @@ pipeline:
         run: ./make.py
 
       - name: install
-        run: ./make.py install
+        run: sudo ./make.py install
 
       - name: licant-libs
         run: licant-libs .
