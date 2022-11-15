@@ -1,5 +1,6 @@
 #include <nos/check.h>
 #include <nos/inet/tcp_client.h>
+#include <nos/input.h>
 #include <onboardtest/test.h>
 #include <onboardtest/testenv.h>
 
@@ -17,8 +18,6 @@ void client_wait_syncronization()
 
 int main(int argc, char **argv)
 {
-    client.init();
-    client.reusing(true);
     client.connect("127.0.0.1", 10001);
 
     onboardtest::TestEnv testenv(client_write, client_wait_syncronization);
