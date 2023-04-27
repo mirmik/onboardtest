@@ -11,7 +11,5 @@ pipeline:
       - name: install
         run: sudo ./make.py install
 
-      - name: licant-libs
-        run: licant-libs .
 
     success_info: "Pipeline: {{pipeline_name}}\nCommit: {{commit_hash}}\nMessage: {{commit_message}}\n"
