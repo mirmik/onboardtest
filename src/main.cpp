@@ -74,7 +74,7 @@ void start_with_iostream(nos::iostream &stream)
     while (1)
     {
         auto exstr = nos::readline_from(stream);
-        if (!exstr)
+        if (exstr.is_error())
         {
             nos::fprintln("Connection closed");
             break;
